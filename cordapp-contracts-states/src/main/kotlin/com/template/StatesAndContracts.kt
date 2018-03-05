@@ -5,6 +5,7 @@ import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.ContractState
 import net.corda.core.identity.Party
+import net.corda.core.schemas.PersistentState
 import net.corda.core.serialization.CordaSerializable
 import net.corda.core.transactions.LedgerTransaction
 
@@ -92,6 +93,6 @@ class ShareContract : Contract {
 class ShareState(val shareValue: Int,
                  val seller: Party,
                  val buyer: Party,
-                 val codigoAcao: String?) : ContractState {
+                 val codigoAcao: String?) : ContractState, PersistentState() {
     override val participants get() = listOf(seller, buyer)
 }
