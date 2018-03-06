@@ -4,14 +4,9 @@ import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.requireThat
 import net.corda.core.contracts.StateAndContract
-import net.corda.core.contracts.StateAndRef
-import net.corda.core.crypto.SecureHash
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.messaging.CordaRPCOps
-import net.corda.core.node.services.Vault
-import net.corda.core.node.services.vault.QueryCriteria
-import net.corda.core.node.services.vault.builder
 import net.corda.core.serialization.SerializationWhitelist
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
@@ -57,7 +52,6 @@ class IPOFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: String
     override fun call() {
         progressTracker.currentStep = INICIO_IPO
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
-        val me = serviceHub.myInfo.legalIdentities
 
         progressTracker.currentStep = MONTANDO_IPO
         val txBuilder = TransactionBuilder(notary = notary)
@@ -74,9 +68,9 @@ class IPOFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: String
         progressTracker.currentStep = ASSINANDO_IPO
         val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
-        val otherpartySession = initiateFlow(enterprise)
+        val otherPartySession = initiateFlow(enterprise)
 
-        val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherpartySession), CollectSignaturesFlow.tracker()))
+        val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherPartySession), CollectSignaturesFlow.tracker()))
 
         progressTracker.currentStep = GRAVANDO_IPO
         subFlow(FinalityFlow(fullySignedTx))
@@ -97,24 +91,8 @@ class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: Str
 
     @Suspendable
     override fun call() {
-        val transactionId = SecureHash.parse(codigoAcao) /*add*/
-
         progressTracker.currentStep = INICIO_CHANGE
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
-
-        val generalCriteria = QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED) /*add*/
-        val logicalExpression = builder { ShareSchemaV1.PersistentShare::codigoAcao.equal(codigoAcao) } /*add*/
-        val customCriteria = QueryCriteria.VaultCustomQueryCriteria(logicalExpression) /*add*/
-        val criteria = customCriteria.and(generalCriteria) /*add*/
-        val vault = serviceHub.vaultService.queryBy(ShareState::class.java, criteria) /*add*/
-
-        val shareState : StateAndRef<ShareState> /*add*/
-
-        try { /*add*/
-            shareState = vault.states.single() /*add*/
-        } catch(t : Throwable) { /*add*/
-            throw Exception("Acao nao encontrada:" + transactionId) /*add*/
-        } /*add*/
 
         progressTracker.currentStep = MONTANDO_CHANGE
         val txBuilder = TransactionBuilder(notary = notary)
@@ -131,9 +109,9 @@ class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: Str
         progressTracker.currentStep = ASSINANDO_CHANGE
         val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
-        val otherpartySession = initiateFlow(enterprise)
+        val otherPartySession = initiateFlow(enterprise)
 
-        val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherpartySession), CollectSignaturesFlow.tracker()))
+        val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherPartySession), CollectSignaturesFlow.tracker()))
 
         progressTracker.currentStep = GRAVANDO_CHANGE
         subFlow(FinalityFlow(fullySignedTx))
@@ -180,10 +158,10 @@ class TradeFlow(val shareValue: Int, val otherParty: Party, val codigoAcao: Stri
         val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
         // Creating a session with the other party
-        val otherpartySession = initiateFlow(otherParty)
+        val otherPartySession = initiateFlow(otherParty)
 
         // Obtaining the counterparty's signature
-        val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherpartySession), CollectSignaturesFlow.tracker()))
+        val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherPartySession), CollectSignaturesFlow.tracker()))
 
         // Finalising the transaction
         progressTracker.currentStep = GRAVANDO_TRADE
