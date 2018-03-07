@@ -1,12 +1,13 @@
 package com.template
 
 import co.paralleluniverse.fibers.Suspendable
-import net.corda.core.contracts.Command
-import net.corda.core.contracts.requireThat
-import net.corda.core.contracts.StateAndContract
+import net.corda.core.contracts.*
+import net.corda.core.crypto.SecureHash
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.messaging.CordaRPCOps
+import net.corda.core.node.services.queryBy
+import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.serialization.SerializationWhitelist
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
@@ -94,6 +95,13 @@ class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: Str
         progressTracker.currentStep = INICIO_CHANGE
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
 
+        // https://docs.corda.net/flow-cookbook.html
+//        val vaultQueryCriteria = QueryCriteria.VaultQueryCriteria()
+//        val results = serviceHub.vaultService.queryBy<ShareState>(vaultQueryCriteria)
+//        val shareStates = results.states
+//        val ourStateRef = StateRef(SecureHash.sha256("ShareStateTransactionHash"), 0)
+//        val ourStateAndRef = serviceHub.toStateAndRef<ShareState>(ourStateRef)
+
         progressTracker.currentStep = MONTANDO_CHANGE
         val txBuilder = TransactionBuilder(notary = notary)
 
@@ -101,7 +109,7 @@ class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: Str
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
         val cmd = Command(ShareContract.Commands.Change(), listOf(ourIdentity.owningKey, enterprise.owningKey))
 
-        txBuilder.withItems(outputContractAndState, cmd)
+        txBuilder.withItems(/*ourStateAndRef, */outputContractAndState, cmd)
 
         progressTracker.currentStep = VERIFICANDO_CHANGE
         txBuilder.verify(serviceHub)

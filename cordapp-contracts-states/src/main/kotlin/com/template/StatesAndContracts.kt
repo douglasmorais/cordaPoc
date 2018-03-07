@@ -43,8 +43,12 @@ class ShareContract : Contract {
                 requireThat {
                     // Constraints on the shape of the transaction
                     // TODO: Como fazer "tx.inputs.size == 1" funcionar?
+//                    "One input should be consumed when changing a share." using (tx.inputs.size == 1)
                     "No inputs should be consumed when changing a share." using (tx.inputs.isEmpty())
                     "There should be one output state of type ShareState." using (tx.outputs.size == 1)
+//                    val input = tx.inputsOfType<ShareState>().single()
+//                    val output = tx.outputsOfType<ShareState>().single()
+//                    "The field 'codigoAcao' must be the same." using (input.codigoAcao == output.codigoAcao)
 
                     // Share-specific constraints
                     val out = tx.outputsOfType<ShareState>().single()
