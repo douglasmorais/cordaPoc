@@ -42,7 +42,7 @@ class TemplateApi(val rpcOps: CordaRPCOps) {
 // *********
 @InitiatingFlow
 @StartableByRPC
-class IPOFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
+class IPOFlow(val shareValue: Int, val owner: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
     object INICIO_IPO : ProgressTracker.Step("Inicio do Flow de IPO")
     object MONTANDO_IPO : ProgressTracker.Step("Montando a transacao de IPO")
     object VERIFICANDO_IPO : ProgressTracker.Step("Verificando a validade da transacao de IPO")
@@ -60,9 +60,9 @@ class IPOFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codi
         progressTracker.currentStep = MONTANDO_IPO
         val txBuilder = TransactionBuilder(notary = notary)
 
-        val outputState = ShareState(shareValue, seller, buyer, codigoAcao)
+        val outputState = ShareState(shareValue, owner, buyer, codigoAcao)
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
-        val cmd = Command(ShareContract.Commands.IPO(), listOf(seller.owningKey, buyer.owningKey))
+        val cmd = Command(ShareContract.Commands.IPO(), listOf(owner.owningKey, buyer.owningKey))
 
         txBuilder.withItems(outputContractAndState, cmd)
 
@@ -83,7 +83,7 @@ class IPOFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codi
 
 @InitiatingFlow
 @StartableByRPC
-class ChangeFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
+class ChangeFlow(val shareValue: Int, val owner: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
     object INICIO_CHANGE : ProgressTracker.Step("Inicio do Flow de variacao de preco")
     object EXTRAINDO_ESTADOS : ProgressTracker.Step("Extraindo os estados")
     object MONTANDO_CHANGE : ProgressTracker.Step("Montando a transacao de variacao de preco")
@@ -114,9 +114,9 @@ class ChangeFlow(val shareValue: Int, val seller: Party, val buyer: Party, val c
         progressTracker.currentStep = MONTANDO_CHANGE
         val txBuilder = TransactionBuilder(notary = notary)
 
-        val outputState = ShareState(shareValue, seller, buyer, codigoAcao)
+        val outputState = ShareState(shareValue, owner, buyer, codigoAcao)
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
-        val cmd = Command(ShareContract.Commands.Change(), listOf(seller.owningKey, buyer.owningKey))
+        val cmd = Command(ShareContract.Commands.Change(), listOf(owner.owningKey, buyer.owningKey))
 
         txBuilder.withItems(state, outputContractAndState, cmd)
 
@@ -137,7 +137,7 @@ class ChangeFlow(val shareValue: Int, val seller: Party, val buyer: Party, val c
 
 @InitiatingFlow
 @StartableByRPC
-class TradeFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
+class TradeFlow(val shareValue: Int, val owner: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
     object INICIO_TRADE : ProgressTracker.Step("Inicio do Flow de compra/venda")
     object EXTRAINDO_ESTADOS : ProgressTracker.Step("Extraindo os estados")
     object MONTANDO_TRADE : ProgressTracker.Step("Montando a transacao de compra/venda")
@@ -172,9 +172,9 @@ class TradeFlow(val shareValue: Int, val seller: Party, val buyer: Party, val co
         val txBuilder = TransactionBuilder(notary = notary)
 
         // We create the transaction components
-        val outputState = ShareState(shareValue, seller, buyer, codigoAcao)
+        val outputState = ShareState(shareValue, owner, buyer, codigoAcao)
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
-        val cmd = Command(ShareContract.Commands.Trade(), listOf(seller.owningKey, buyer.owningKey))
+        val cmd = Command(ShareContract.Commands.Trade(), listOf(owner.owningKey, buyer.owningKey))
 
         // We add the items to the builder
         txBuilder.withItems(state, outputContractAndState, cmd)
