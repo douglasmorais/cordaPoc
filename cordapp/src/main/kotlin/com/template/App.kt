@@ -6,8 +6,11 @@ import net.corda.core.crypto.SecureHash
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.messaging.CordaRPCOps
+import net.corda.core.node.services.Vault
+import net.corda.core.node.services.VaultQueryException
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
+import net.corda.core.node.services.vault.builder
 import net.corda.core.serialization.SerializationWhitelist
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
@@ -39,7 +42,7 @@ class TemplateApi(val rpcOps: CordaRPCOps) {
 // *********
 @InitiatingFlow
 @StartableByRPC
-class IPOFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: String?) : FlowLogic<Unit>() {
+class IPOFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
     object INICIO_IPO : ProgressTracker.Step("Inicio do Flow de IPO")
     object MONTANDO_IPO : ProgressTracker.Step("Montando a transacao de IPO")
     object VERIFICANDO_IPO : ProgressTracker.Step("Verificando a validade da transacao de IPO")
@@ -57,9 +60,9 @@ class IPOFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: String
         progressTracker.currentStep = MONTANDO_IPO
         val txBuilder = TransactionBuilder(notary = notary)
 
-        val outputState = ShareState(shareValue, ourIdentity, enterprise, codigoAcao)
+        val outputState = ShareState(shareValue, seller, buyer, codigoAcao)
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
-        val cmd = Command(ShareContract.Commands.IPO(), listOf(ourIdentity.owningKey, enterprise.owningKey))
+        val cmd = Command(ShareContract.Commands.IPO(), listOf(seller.owningKey, buyer.owningKey))
 
         txBuilder.withItems(outputContractAndState, cmd)
 
@@ -69,7 +72,7 @@ class IPOFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: String
         progressTracker.currentStep = ASSINANDO_IPO
         val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
-        val otherPartySession = initiateFlow(enterprise)
+        val otherPartySession = initiateFlow(buyer)
 
         val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherPartySession), CollectSignaturesFlow.tracker()))
 
@@ -80,14 +83,15 @@ class IPOFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: String
 
 @InitiatingFlow
 @StartableByRPC
-class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: String) : FlowLogic<Unit>() {
+class ChangeFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
     object INICIO_CHANGE : ProgressTracker.Step("Inicio do Flow de variacao de preco")
+    object EXTRAINDO_ESTADOS : ProgressTracker.Step("Extraindo os estados")
     object MONTANDO_CHANGE : ProgressTracker.Step("Montando a transacao de variacao de preco")
     object VERIFICANDO_CHANGE : ProgressTracker.Step("Verificando a validade da transacao de variacao de preco")
     object ASSINANDO_CHANGE : ProgressTracker.Step("Assinando a transacao de variacao de preco")
     object GRAVANDO_CHANGE : ProgressTracker.Step("Enviando a transacao para o Notary e gravando localmente")
 
-    override val progressTracker = ProgressTracker(INICIO_CHANGE, MONTANDO_CHANGE, VERIFICANDO_CHANGE,
+    override val progressTracker = ProgressTracker(INICIO_CHANGE, EXTRAINDO_ESTADOS, MONTANDO_CHANGE, VERIFICANDO_CHANGE,
             ASSINANDO_CHANGE, GRAVANDO_CHANGE)
 
     @Suspendable
@@ -95,21 +99,26 @@ class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: Str
         progressTracker.currentStep = INICIO_CHANGE
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
 
-        // https://docs.corda.net/flow-cookbook.html
-//        val vaultQueryCriteria = QueryCriteria.VaultQueryCriteria()
-//        val results = serviceHub.vaultService.queryBy<ShareState>(vaultQueryCriteria)
-//        val shareStates = results.states
-//        val ourStateRef = StateRef(SecureHash.sha256("ShareStateTransactionHash"), 0)
-//        val ourStateAndRef = serviceHub.toStateAndRef<ShareState>(ourStateRef)
+        progressTracker.currentStep = EXTRAINDO_ESTADOS
+        val transactionId = codigoAcao
+        val criteria = QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED)
+        val vault = serviceHub.vaultService.queryBy<ShareState>(criteria)
+        val state : StateAndRef<ShareState>
+
+        try {
+            state = vault.states.single()
+        } catch(t : Throwable) {
+            throw Exception("Acao nao encontrada:" + transactionId)
+        }
 
         progressTracker.currentStep = MONTANDO_CHANGE
         val txBuilder = TransactionBuilder(notary = notary)
 
-        val outputState = ShareState(shareValue, ourIdentity, enterprise, codigoAcao)
+        val outputState = ShareState(shareValue, seller, buyer, codigoAcao)
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
-        val cmd = Command(ShareContract.Commands.Change(), listOf(ourIdentity.owningKey, enterprise.owningKey))
+        val cmd = Command(ShareContract.Commands.Change(), listOf(seller.owningKey, buyer.owningKey))
 
-        txBuilder.withItems(/*ourStateAndRef, */outputContractAndState, cmd)
+        txBuilder.withItems(state, outputContractAndState, cmd)
 
         progressTracker.currentStep = VERIFICANDO_CHANGE
         txBuilder.verify(serviceHub)
@@ -117,7 +126,7 @@ class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: Str
         progressTracker.currentStep = ASSINANDO_CHANGE
         val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
-        val otherPartySession = initiateFlow(enterprise)
+        val otherPartySession = initiateFlow(buyer)
 
         val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherPartySession), CollectSignaturesFlow.tracker()))
 
@@ -128,15 +137,16 @@ class ChangeFlow(val shareValue: Int, val enterprise: Party, val codigoAcao: Str
 
 @InitiatingFlow
 @StartableByRPC
-class TradeFlow(val shareValue: Int, val otherParty: Party, val codigoAcao: String?) : FlowLogic<Unit>() {
+class TradeFlow(val shareValue: Int, val seller: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
     object INICIO_TRADE : ProgressTracker.Step("Inicio do Flow de compra/venda")
+    object EXTRAINDO_ESTADOS : ProgressTracker.Step("Extraindo os estados")
     object MONTANDO_TRADE : ProgressTracker.Step("Montando a transacao de compra/venda")
     object VERIFICANDO_TRADE : ProgressTracker.Step("Verificando a validade da transacao de compra/venda")
     object ASSINANDO_TRADE : ProgressTracker.Step("Assinando a transacao de compra/venda")
     object GRAVANDO_TRADE : ProgressTracker.Step("Enviando a transacao para o Notary e gravando localmente")
 
     /** The progress tracker provides checkpoints indicating the progress of the flow to observers. */
-    override val progressTracker = ProgressTracker(INICIO_TRADE, MONTANDO_TRADE, VERIFICANDO_TRADE, ASSINANDO_TRADE, GRAVANDO_TRADE)
+    override val progressTracker = ProgressTracker(INICIO_TRADE, EXTRAINDO_ESTADOS, MONTANDO_TRADE, VERIFICANDO_TRADE, ASSINANDO_TRADE, GRAVANDO_TRADE)
 
     /** The flow logic is encapsulated within the call() method. */
     @Suspendable
@@ -145,17 +155,29 @@ class TradeFlow(val shareValue: Int, val otherParty: Party, val codigoAcao: Stri
         progressTracker.currentStep = INICIO_TRADE
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
 
+        progressTracker.currentStep = EXTRAINDO_ESTADOS
+        val transactionId = codigoAcao
+        val criteria = QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED)
+        val vault = serviceHub.vaultService.queryBy<ShareState>(criteria)
+        val state : StateAndRef<ShareState>
+
+        try {
+            state = vault.states.single()
+        } catch(t : Throwable) {
+            throw Exception("Acao nao encontrada:" + transactionId)
+        }
+
         // We create a transaction builder
         progressTracker.currentStep = MONTANDO_TRADE
         val txBuilder = TransactionBuilder(notary = notary)
 
         // We create the transaction components
-        val outputState = ShareState(shareValue, ourIdentity, otherParty, codigoAcao)
+        val outputState = ShareState(shareValue, seller, buyer, codigoAcao)
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
-        val cmd = Command(ShareContract.Commands.Trade(), listOf(ourIdentity.owningKey, otherParty.owningKey))
+        val cmd = Command(ShareContract.Commands.Trade(), listOf(seller.owningKey, buyer.owningKey))
 
         // We add the items to the builder
-        txBuilder.withItems(outputContractAndState, cmd)
+        txBuilder.withItems(state, outputContractAndState, cmd)
 
         // Verifying the transaction
         progressTracker.currentStep = VERIFICANDO_TRADE
@@ -166,7 +188,7 @@ class TradeFlow(val shareValue: Int, val otherParty: Party, val codigoAcao: Stri
         val signedTx = serviceHub.signInitialTransaction(txBuilder)
 
         // Creating a session with the other party
-        val otherPartySession = initiateFlow(otherParty)
+        val otherPartySession = initiateFlow(buyer)
 
         // Obtaining the counterparty's signature
         val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherPartySession), CollectSignaturesFlow.tracker()))
