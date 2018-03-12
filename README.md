@@ -1,12 +1,14 @@
 ![Corda](https://www.corda.net/wp-content/uploads/2016/11/fg005_corda_b.png)
 
-# CorDapp Template
+# CordaPoc
 
-Welcome to the CorDapp template. The CorDapp template is a stubbed-out CorDapp 
-which you can use to bootstrap your own CorDapp projects.
+Welcome to the CordaPoc. The CordaPoc is based on the [CorDapp tutorial](http://docs.corda.net/tutorial-cordapp.html) found on the Corda docsite.
 
-**This is the KOTLIN version of the CorDapp template. For the JAVA version click 
-[here](https://github.com/corda/cordapp-template-java/).**
+**This is the KOTLIN version of the CordaPoc.**
+
+**Instead, if you are interested in exploring the Corda codebase itself,
+contributing to the core Corda platform or viewing and running sample
+demos then clone the [corda repository](https://github.com/corda/corda).**
 
 ## Pre-Requisites
 
@@ -27,11 +29,11 @@ Corda docsite.
 
 To get started, clone this repository with:
 
-     git clone https://github.com/corda/cordapp-template-kotlin.git
+     git clone https://github.com/douglasmorais/cordaPoc.git
 
 And change directories to the newly cloned repo:
 
-     cd cordapp-template-kotlin
+     cd cordaPoc
 
 ## Building the CorDapp template:
 
