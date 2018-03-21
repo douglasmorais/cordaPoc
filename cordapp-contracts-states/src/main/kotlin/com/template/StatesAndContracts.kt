@@ -41,7 +41,7 @@ class ShareContract : Contract {
                 }
             }
 
-            is Commands.Change -> {
+            is Commands.ChangeValue -> {
                 requireThat {
                     // Constraints on the shape of the transaction
                     "One input should be consumed when changing a share." using (tx.inputs.size == 1)
@@ -83,7 +83,7 @@ class ShareContract : Contract {
     // Used to indicate the transaction's intent.
     interface Commands : CommandData {
         class IPO: TypeOnlyCommandData(), Commands
-        class Change: TypeOnlyCommandData(), Commands
+        class ChangeValue: TypeOnlyCommandData(), Commands
         class Trade: TypeOnlyCommandData(), Commands
     }
 }

@@ -83,7 +83,7 @@ class IPOFlow(val shareValue: Int, val owner: Party, val buyer: Party, val codig
 
 @InitiatingFlow
 @StartableByRPC
-class ChangeFlow(val shareValue: Int, val owner: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
+class ChangeValueFlow(val shareValue: Int, val owner: Party, val buyer: Party, val codigoAcao: String) : FlowLogic<Unit>() {
     object INICIO_CHANGE : ProgressTracker.Step("Inicio do Flow de variacao de preco")
     object EXTRAINDO_ESTADOS : ProgressTracker.Step("Extraindo os estados")
     object MONTANDO_CHANGE : ProgressTracker.Step("Montando a transacao de variacao de preco")
@@ -116,7 +116,7 @@ class ChangeFlow(val shareValue: Int, val owner: Party, val buyer: Party, val co
 
         val outputState = ShareState(shareValue, owner, buyer, codigoAcao)
         val outputContractAndState = StateAndContract(outputState, SHARE_CONTRACT_ID)
-        val cmd = Command(ShareContract.Commands.Change(), listOf(owner.owningKey, buyer.owningKey))
+        val cmd = Command(ShareContract.Commands.ChangeValue(), listOf(owner.owningKey, buyer.owningKey))
 
         txBuilder.withItems(state, outputContractAndState, cmd)
 
@@ -233,8 +233,8 @@ class IPOFlowResponder(val otherPartySession: FlowSession) : FlowLogic<Unit>() {
     }
 }
 
-@InitiatedBy(ChangeFlow::class)
-class ChangeFlowResponder(val otherPartySession: FlowSession) : FlowLogic<Unit>() {
+@InitiatedBy(ChangeValueFlow::class)
+class ChangeValueFlowResponder(val otherPartySession: FlowSession) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {
         val signTransationFlow = object : SignTransactionFlow(otherPartySession, SignTransactionFlow.tracker()) {
