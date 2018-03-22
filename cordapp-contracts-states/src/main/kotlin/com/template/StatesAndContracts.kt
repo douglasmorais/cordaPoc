@@ -19,7 +19,6 @@ class ShareContract : Contract {
     class Create : CommandData
 
     override fun verify(tx: LedgerTransaction) {
-//        val command = tx.commands.requireSingleCommand<Create>()
         val command = tx.findCommand<Commands> { true }
 
         when (command.value) {
@@ -33,11 +32,11 @@ class ShareContract : Contract {
                     val input = tx.inputsOfType<ShareState>().single()
                     val out = tx.outputsOfType<ShareState>().single()
                     "The share value must be positive." using (out.shareValue > 0)
-                    "The owner and the buyer cannot be the same entity." using (input.owner != out.buyer)
+                    "The old owner and the new owner cannot be the same entity." using (input.owner != out.owner)
 
                     // Constraints on the signers
-                    "There must be two signers." using (command.signers.toSet().size == 2)
-                    "The owner and the buyer must be signers." using (command.signers.containsAll(listOf(out.owner.owningKey, out.buyer.owningKey)))
+                    "There must be two signers." using (command.signers.toSet().size == 1)
+                    "The new owner must be a signer." using (command.signers.containsAll(listOf(out.owner.owningKey)))
                 }
             }
 
@@ -51,12 +50,10 @@ class ShareContract : Contract {
                     val input = tx.inputsOfType<ShareState>().single()
                     val out = tx.outputsOfType<ShareState>().single()
                     "The share value must be positive." using (out.shareValue > 0)
-                    "The owner and the buyer must be the same entity." using (input.owner == out.buyer)
+                    "The old owner and the new owner must be the same entity." using (input.owner == out.owner)
 
                     // Constraints on the signers
-                    // TODO: A regra de um assinante trava a transação com enterprise = outro nó!
-//                    "There must be one signer." using (command.signers.toSet().size == 1)
-                    "The owner must be a signer." using (command.signers.containsAll(listOf(out.owner.owningKey)))
+                    "The new owner must be a signer." using (command.signers.containsAll(listOf(out.owner.owningKey)))
                 }
             }
 
@@ -69,12 +66,10 @@ class ShareContract : Contract {
                     // Share-specific constraints
                     val out = tx.outputsOfType<ShareState>().single()
                     "The share value must be positive." using (out.shareValue > 0)
-                    "The owner and the buyer must be the same entity." using (out.owner == out.buyer)
 
                     // Constraints on the signers
-                    // TODO: A regra de dois assinantes trava a transação!
                     "There must be one signer." using (command.signers.toSet().size == 1)
-                    "The enterprise must be a signer." using (command.signers.containsAll(listOf(out.owner.owningKey)))
+                    "The owner must be a signer." using (command.signers.containsAll(listOf(out.owner.owningKey)))
                 }
             }
         }
@@ -93,9 +88,8 @@ class ShareContract : Contract {
 // *********
 class ShareState(val shareValue: Int,
                  val owner: Party,
-                 val buyer: Party,
                  val codigoAcao: String) : ContractState {
-    override val participants get() = listOf(owner, buyer)
+    override val participants get() = listOf(owner)
 }
 
 
