@@ -56,24 +56,52 @@ built nodes are located:
      cd build/nodes
 
 The Gradle build script will have created a folder for each node. You'll
-see three folders, one for each node and a `runnodes` script. You can
-run the nodes with:
+see three folders, one for each node and a `runnodes` script.
 
-**Unix:**
+## Interacting with the nodes
 
-     ./runnodes --log-to-console --logging-level=DEBUG
+Go to the terminal window displaying the CRaSH shell of PartyA. Typing 'help' will display a list of the available commands.
 
-**Windows:**
+We want to create an IPO, with shares from company "A". We start the 'IPOFlow' by typing:
 
-    runnodes.bat --log-to-console --logging-level=DEBUG
+     start IPOFlow shareValue: 100, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
-You should now have three Corda nodes running on your machine serving 
-the template.
+If the flow worked, it should have recorded in the vault of PartyA. Let's check, running:
 
-When the nodes have booted up, you should see a message like the following 
-in the console: 
+     run vaultQuery contractStateType: com.template.ShareState
 
-     Node started up and registered in 5.007 sec
+The vault of PartyA should display the following output:
+
+     states:
+     - state:
+         data:
+           shareValue: 100
+           owner: "C=GB,L=London,O=PartyA"
+           codigoAcao: "A"
+           participants:
+           - "C=GB,L=London,O=PartyA"
+         contract: "com.template.ShareContract"
+         notary: "C=GB,L=London,O=Controller,CN=corda.notary.validating"
+         encumbrance: null
+         constraint:
+           attachmentId: "4273B55BA46E3ACF06B1C11865526FC84F51ABF3CE489A2DCCB8149B8187B18F"
+       ref:
+         txhash: "E4F20D3FC7016B470110DC063001671BF0ECDDDE99C5337A9D31C55CB597072E"
+         index: 0
+     statesMetadata:
+     - ref:
+         txhash: "E4F20D3FC7016B470110DC063001671BF0ECDDDE99C5337A9D31C55CB597072E"
+         index: 0
+       contractStateClassName: "com.template.ShareState"
+       recordedTime: 1521834554.082000000
+       consumedTime: null
+       status: "UNCONSUMED"
+       notary: "C=GB,L=London,O=Controller,CN=corda.notary.validating"
+       lockId: null
+       lockUpdateTime: 1521834554.142000000
+     totalStatesAvailable: -1
+     stateTypes: "UNCONSUMED"
+     otherResults: []
 
 ## Interacting with the CorDapp via HTTP
 
