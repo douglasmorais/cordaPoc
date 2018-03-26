@@ -6,26 +6,25 @@ Bem-vindo(a) ao CordaPoc. O CordaPoc é baseado no [tutorial CorDapp](http://doc
 
 **Esta é a versão em KOTLIN do CordaPoc.**
 
-**Instead, if you are interested in exploring the Corda codebase itself,
-contributing to the core Corda platform or viewing and running sample
-demos then clone the [corda repository](https://github.com/corda/corda).**
+**Caso esteja interessado(a) em explorar o conteúdo em código do Corda,
+contribuir ao core da plataforma Corda ou ver e executar os
+demos então clone o [repositório corda](https://github.com/corda/corda).**
 
-*Leia em outros idiomas: [English](README.md)
+*Leia em outros idiomas: [English](README.md)*
 
-## Pre-Requisites
+## Pré-Requisitos
 
-You will need the following installed on your machine before you can start:
+Será necessário instalar o seguinte antes de começar:
 
 * [JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 
-  installed and available on your path (Minimum version: 1.8_131).
-* [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) (Minimum version 2017.1)
+  instalado e alcançável no seu path (Versão mínima: 1.8_131).
+* [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) (Versão mínima: 2017.1)
 * git
-* Optional: [h2 web console](http://www.h2database.com/html/download.html)
-  (download the "platform-independent zip")
+* Opcional: [h2 web console](http://www.h2database.com/html/download.html)
+  (baixe o "platform-independent zip")
 
-For more detailed information, see the
-[getting set up](https://docs.corda.net/getting-set-up.html) page on the
-Corda docsite.
+Para mais informações, veja a página
+[getting set up](https://docs.corda.net/getting-set-up.html) no site de documentação do Corda.
 
 ## Getting Set Up
 
