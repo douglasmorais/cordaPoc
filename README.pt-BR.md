@@ -10,7 +10,7 @@ Bem-vindo(a) ao CordaPoc. O CordaPoc é baseado no [tutorial CorDapp](http://doc
 contributing to the core Corda platform or viewing and running sample
 demos then clone the [corda repository](https://github.com/corda/corda).**
 
-*Leia em outros idiomas: [English](README.en.md)
+*Leia em outros idiomas: [English](README.md)
 
 ## Pre-Requisites
 
