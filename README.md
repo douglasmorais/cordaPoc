@@ -62,7 +62,7 @@ see three folders, one for each node and a `runnodes` script.
 
 Go to the terminal window displaying the CRaSH shell of PartyA. Typing 'help' will display a list of the available commands.
 
-We want to create an IPO, with shares from company "A". We start the 'IPOFlow' by typing:
+Firstly, we want to create an IPO, with shares from company "A". We start the `IPOFlow` by typing:
 
      start IPOFlow shareValue: 100, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
@@ -99,6 +99,88 @@ The vault of PartyA should display the following output:
        notary: "C=GB,L=London,O=Controller,CN=corda.notary.validating"
        lockId: null
        lockUpdateTime: 1521834554.142000000
+     totalStatesAvailable: -1
+     stateTypes: "UNCONSUMED"
+     otherResults: []
+
+Secondly, we can the share price, with:
+
+     start ChangeValueFlow shareValue: 80, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
+
+Now, the vault of PartyA displays only the last state, with the new price:
+
+     states:
+     - state:
+         data:
+           shareValue: 80
+           owner: "C=GB,L=London,O=PartyA"
+           codigoAcao: "A"
+           participants:
+           - "C=GB,L=London,O=PartyA"
+         contract: "com.template.ShareContract"
+         notary: "C=GB,L=London,O=Controller,CN=corda.notary.validating"
+         encumbrance: null
+         constraint:
+           attachmentId: "A1FED7C10FBB02F9F13EB6EBEB59730CAF1D73DD0AB680BAD1D8338BCA235232"
+       ref:
+         txhash: "A337543D7D59E7047F86898BF25D60E64A249A985ADF6A0497AA5D944F1A4236"
+         index: 0
+     statesMetadata:
+     - ref:
+         txhash: "A337543D7D59E7047F86898BF25D60E64A249A985ADF6A0497AA5D944F1A4236"
+         index: 0
+       contractStateClassName: "com.template.ShareState"
+       recordedTime: 1522091941.076000000
+       consumedTime: null
+       status: "UNCONSUMED"
+       notary: "C=GB,L=London,O=Controller,CN=corda.notary.validating"
+       lockId: null
+       lockUpdateTime: 1522091941.175000000
+     totalStatesAvailable: -1
+     stateTypes: "UNCONSUMED"
+     otherResults: []
+
+Finally, we can change the owner of the share, typing:
+
+     start TradeFlow shareValue: 90, owner: "O=PartyB,L=New York,C=US", codigoAcao: "A"
+
+The vault of PartyA should display the following output:
+
+     states: []
+     statesMetadata: []
+     totalStatesAvailable: -1
+     stateTypes: "UNCONSUMED"
+     otherResults: []
+
+Go to the terminal window displaying the CRaSH shell of PartyB. The vault of PartyB should display the following output:
+
+     states:
+     - state:
+         data:
+           shareValue: 90
+           owner: "C=US,L=New York,O=PartyB"
+           codigoAcao: "A"
+           participants:
+           - "C=US,L=New York,O=PartyB"
+         contract: "com.template.ShareContract"
+         notary: "C=GB,L=London,O=Controller,CN=corda.notary.validating"
+         encumbrance: null
+         constraint:
+           attachmentId: "A1FED7C10FBB02F9F13EB6EBEB59730CAF1D73DD0AB680BAD1D8338BCA235232"
+       ref:
+         txhash: "112557268D7827A6A37FB42A270F9492B93ABAEC8D676C4297407BA0952A3B84"
+         index: 0
+     statesMetadata:
+     - ref:
+         txhash: "112557268D7827A6A37FB42A270F9492B93ABAEC8D676C4297407BA0952A3B84"
+         index: 0
+       contractStateClassName: "com.template.ShareState"
+       recordedTime: 1522092209.811000000
+       consumedTime: null
+       status: "UNCONSUMED"
+       notary: "C=GB,L=London,O=Controller,CN=corda.notary.validating"
+       lockId: null
+       lockUpdateTime: 1522092210.088000000
      totalStatesAvailable: -1
      stateTypes: "UNCONSUMED"
      otherResults: []
