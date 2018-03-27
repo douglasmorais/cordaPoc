@@ -105,7 +105,7 @@ The vault of PartyA should display the following output:
      stateTypes: "UNCONSUMED"
      otherResults: []
 
-Secondly, we can the share price, with:
+Secondly, we can change the share price, with:
 
      start ChangeValueFlow shareValue: 80, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
@@ -154,7 +154,11 @@ The vault of PartyA should display the following output:
      stateTypes: "UNCONSUMED"
      otherResults: []
 
-Go to the terminal window displaying the CRaSH shell of PartyB. The vault of PartyB should display the following output:
+Go to the terminal window displaying the CRaSH shell of PartyB, and check the vault, running:
+
+     run vaultQuery contractStateType: com.template.ShareState
+
+The vault of PartyB should display the following output:
 
      states:
      - state:

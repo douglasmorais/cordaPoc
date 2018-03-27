@@ -8,7 +8,7 @@ Bem-vindo(a) ao CordaPoc. O CordaPoc é baseado no [tutorial CorDapp](http://doc
 
 **Caso esteja interessado(a) em explorar o conteúdo em código do Corda,
 contribuir ao core da plataforma Corda ou ver e executar os
-demos então clone o [repositório corda](https://github.com/corda/corda).**
+demos, clone o [repositório corda](https://github.com/corda/corda).**
 
 *Leia em outros idiomas: [English](README.md)*
 
@@ -28,15 +28,15 @@ Para mais informações, veja a página
 
 ## Getting Set Up
 
-To get started, clone this repository with:
+Para começar, clone o repositório com o comando:
 
      git clone https://github.com/douglasmorais/cordaPoc.git
 
-And change directories to the newly cloned repo:
+E mude o diretório para o recém clonado repositório:
 
      cd cordaPoc
 
-## Building the CorDapp template:
+## Gerando os Nós
 
 **Unix:** 
 
@@ -46,32 +46,31 @@ And change directories to the newly cloned repo:
 
      gradlew.bat deployNodes
 
-Note: You'll need to re-run this build step after making any changes to
-the template for these to take effect on the node.
+Obs: Você precisará fazer esse passo após qualquer modificação que fizer no projeto,
+para que tenha efeito aos nós.
 
-## Running the Nodes
+## Rodando os Nós
 
-Once the build finishes, change directories to the folder where the newly
-built nodes are located:
+Com os nós gerados, mude para a pasta em que eles estão:
 
      cd build/nodes
 
-The Gradle build script will have created a folder for each node. You'll
-see three folders, one for each node and a `runnodes` script.
+O script de geração de nós do Gradle terá criado uma pasta para cada nó. Existirão três pastas,
+uma para cada nó e um script `runnodes`.
 
-## Interacting with the nodes
+## Interagindo com os nós
 
-Go to the terminal window displaying the CRaSH shell of PartyA. Typing 'help' will display a list of the available commands.
+Na janela de terminal referente ao nó PartyA, o comando 'help' mostrará uma lista com os comandos disponíveis.
 
-Firstly, we want to create an IPO, with shares from company "A". We start the `IPOFlow` by typing:
+Primeiramente, queremos fazer um IPO, com ações da empresa "A". Iniciamos o `IPOFlow` com o seguinte comando:
 
      start IPOFlow shareValue: 100, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
-If the flow worked, it should have recorded in the vault of PartyA. Let's check, running:
+Se o fluxo funcionou, ele deverá estar salvo na vault do nó PartyA. Para visualizar:
 
      run vaultQuery contractStateType: com.template.ShareState
 
-The vault of PartyA should display the following output:
+A vault do nó PartyA deverá mostrar o seguinte:
 
      states:
      - state:
@@ -104,11 +103,11 @@ The vault of PartyA should display the following output:
      stateTypes: "UNCONSUMED"
      otherResults: []
 
-Secondly, we can the share price, with:
+Em seguida, podemos mudar o valor da ação, com:
 
      start ChangeValueFlow shareValue: 80, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
-Now, the vault of PartyA displays only the last state, with the new price:
+Assim, a vault do nó PartyA mostrará somente o último estado, com o novo valor:
 
      states:
      - state:
@@ -141,11 +140,11 @@ Now, the vault of PartyA displays only the last state, with the new price:
      stateTypes: "UNCONSUMED"
      otherResults: []
 
-Finally, we can change the owner of the share, typing:
+Finalmente, podemos mudar o dono da ação:
 
      start TradeFlow shareValue: 90, owner: "O=PartyB,L=New York,C=US", codigoAcao: "A"
 
-The vault of PartyA should display the following output:
+A vault do nó PartyA deverá mostrar o seguinte:
 
      states: []
      statesMetadata: []
@@ -153,7 +152,11 @@ The vault of PartyA should display the following output:
      stateTypes: "UNCONSUMED"
      otherResults: []
 
-Go to the terminal window displaying the CRaSH shell of PartyB. The vault of PartyB should display the following output:
+Na janela de terminal relativa ao nó PartyB digite o comando para visualizar sua vault:
+
+     run vaultQuery contractStateType: com.template.ShareState
+
+A vault do nó PartyB deverá mostrar o seguinte:
 
      states:
      - state:
@@ -264,7 +267,7 @@ Each machine should now run its nodes using `runnodes` or `runnodes.bat`
 files. Once they are up and running, the nodes should be able to communicate 
 among themselves in the same way as when they were running on the same machine.
 
-## Further reading
+## Conteúdo adicional
 
-Tutorials and developer docs for CorDapps and Corda are
-[here](https://docs.corda.net/).
+Tutoriais e documentação para desenvolvedores de CorDapps e Corda estão disponíveis
+[aqui](https://docs.corda.net/).
