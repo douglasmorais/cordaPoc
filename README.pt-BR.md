@@ -26,7 +26,7 @@ Será necessário instalar o seguinte antes de começar:
 Para mais informações, veja a página
 [getting set up](https://docs.corda.net/getting-set-up.html) no site de documentação do Corda.
 
-## Getting Set Up
+## Preparação
 
 Para começar, clone o repositório com o comando:
 
@@ -58,7 +58,7 @@ Com os nós gerados, mude para a pasta em que eles estão:
 O script de geração de nós do Gradle terá criado uma pasta para cada nó. Existirão três pastas,
 uma para cada nó e um script `runnodes`.
 
-## Interagindo com os nós
+## Interagindo com os Nós
 
 Na janela de terminal referente ao nó PartyA, o comando 'help' mostrará uma lista com os comandos disponíveis.
 
@@ -189,28 +189,28 @@ A vault do nó PartyB deverá mostrar o seguinte:
      stateTypes: "UNCONSUMED"
      otherResults: []
 
-## Interacting with the CorDapp via HTTP
+## Interagindo com o CordaPoc via HTTP
 
-The CorDapp defines a couple of HTTP API end-points and also serves some
-static web content. Initially, these return generic template responses.
+O CordaPoc define endpoints da API e disponibilizam certo conteúdo
+web estático. Inicialmente, eles retornam respostas genéricas.
 
-The nodes can be found using the following port numbers, defined in 
-`build.gradle`, as well as the `node.conf` file for each node found
-under `build/nodes/partyX`:
+Os nós podem ser encontrados usando as seguintes portas, definidas em
+`build.gradle`, e no arquivo `node.conf` para cada nó presente
+em `build/nodes/partyX`:
 
      PartyA: localhost:10007
      PartyB: localhost:10010
 
-As the nodes start up, they should tell you which host and port their
-embedded web server is running on. The API endpoints served are:
+Assim que os nós iniciem, deverão ser mostradas em quais host e porta os
+servidores web estão rodando. Os endpoints disponibilizados da API estão em:
 
      /api/template/templateGetEndpoint
 
-And the static web content is served from:
+O conteúdo web estático é disponibilizado por:
 
      /web/template
 
-## Using the Example RPC Client
+## Usando o Cliente de Examplo RPC
 
 The `ExampleClient.kt` file is a simple utility which uses the client
 RPC library to connect to a node and log its transaction activity.
