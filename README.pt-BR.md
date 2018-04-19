@@ -60,15 +60,36 @@ uma para cada nó e um script `runnodes`.
 
 ## Interagindo com os Nós
 
-Na janela de terminal referente ao nó PartyA, o comando 'help' mostrará uma lista com os comandos disponíveis.
+Nós iniciados via terminal mostrarão um shell interativo:
+
+    Welcome to the Corda interactive shell.
+    Useful commands include 'help' to see what is available, and 'bye' to shut down the node.
+
+    Thu Apr 19 09:18:09 BRT 2018>>>
+
+Na janela de terminal referente ao nó PartyA, o comando `help` mostrará uma lista com os comandos disponíveis.
+
+O comando `flow list` mostra uma lista com os flows que o nó pode rodar. Em nosso caso, irá retornar a seguinte lista:
+
+     com.template.ChangeValueFlow
+     com.template.IPOFlow
+     com.template.TradeFlow
+     net.corda.core.flows.ContractUpgradeFlow$Authorise
+     net.corda.core.flows.ContractUpgradeFlow$Deauthorise
+     net.corda.core.flows.ContractUpgradeFlow$Initiate
+     net.corda.finance.flows.CashConfigDataFlow
+     net.corda.finance.flows.CashExitFlow
+     net.corda.finance.flows.CashIssueAndPaymentFlow
+     net.corda.finance.flows.CashIssueFlow
+     net.corda.finance.flows.CashPaymentFlow
 
 Primeiramente, queremos fazer um IPO, com ações da empresa "A". Iniciamos o `IPOFlow` com o seguinte comando:
 
-     start IPOFlow shareValue: 100, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
+    start IPOFlow shareValue: 100, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
 Se o fluxo funcionou, ele deverá estar salvo na vault do nó PartyA. Para visualizar:
 
-     run vaultQuery contractStateType: com.template.ShareState
+    run vaultQuery contractStateType: com.template.ShareState
 
 A vault do nó PartyA deverá mostrar o seguinte:
 
@@ -105,7 +126,7 @@ A vault do nó PartyA deverá mostrar o seguinte:
 
 Em seguida, podemos mudar o valor da ação, com:
 
-     start ChangeValueFlow shareValue: 80, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
+    start ChangeValueFlow shareValue: 80, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
 Assim, a vault do nó PartyA mostrará somente o último estado, com o novo valor:
 
@@ -142,7 +163,7 @@ Assim, a vault do nó PartyA mostrará somente o último estado, com o novo valo
 
 Finalmente, podemos mudar o dono da ação:
 
-     start TradeFlow shareValue: 90, owner: "O=PartyB,L=New York,C=US", codigoAcao: "A"
+    start TradeFlow shareValue: 90, owner: "O=PartyB,L=New York,C=US", codigoAcao: "A"
 
 A vault do nó PartyA deverá mostrar o seguinte:
 
@@ -154,7 +175,7 @@ A vault do nó PartyA deverá mostrar o seguinte:
 
 Na janela de terminal relativa ao nó PartyB digite o comando para visualizar sua vault:
 
-     run vaultQuery contractStateType: com.template.ShareState
+    run vaultQuery contractStateType: com.template.ShareState
 
 A vault do nó PartyB deverá mostrar o seguinte:
 
@@ -191,7 +212,7 @@ A vault do nó PartyB deverá mostrar o seguinte:
 
 ## Interagindo com o CordaPoc via HTTP
 
-O CordaPoc define endpoints da API e disponibilizam certo conteúdo
+O CordaPoc define endpoints da API e disponibiliza conteúdo
 web estático. Inicialmente, eles retornam respostas genéricas.
 
 Os nós podem ser encontrados usando as seguintes portas, definidas em
@@ -209,32 +230,6 @@ servidores web estão rodando. Os endpoints disponibilizados da API estão em:
 O conteúdo web estático é disponibilizado por:
 
      /web/template
-
-## Usando o Cliente de Examplo RPC
-
-The `ExampleClient.kt` file is a simple utility which uses the client
-RPC library to connect to a node and log its transaction activity.
-It will log any existing states and listen for any future states. To build 
-the client use the following Gradle task:
-
-     ./gradlew runTemplateClient
-
-To run the client:
-
-**Via IntelliJ:**
-
-Select the 'Run Template RPC Client'
-run configuration which, by default, connect to PartyA (RPC port 10006). Click the
-Green Arrow to run the client.
-
-**Via the command line:**
-
-Run the following Gradle task:
-
-     ./gradlew runTemplateClient
-     
-Note that the template rPC client won't output anything to the console as no state 
-objects are contained in either PartyA's or PartyB's vault.
 
 ## Running the Nodes Across Multiple Machines
 

@@ -31,21 +31,21 @@ Corda docsite.
 
 To get started, clone this repository with:
 
-     git clone https://github.com/douglasmorais/cordaPoc.git
+    git clone https://github.com/douglasmorais/cordaPoc.git
 
 And change directories to the newly cloned repo:
 
-     cd cordaPoc
+    cd cordaPoc
 
 ## Building the CorDapp template:
 
 **Unix:** 
 
-     ./gradlew deployNodes
+    ./gradlew deployNodes
 
 **Windows:**
 
-     gradlew.bat deployNodes
+    gradlew.bat deployNodes
 
 Note: You'll need to re-run this build step after making any changes to
 the template for these to take effect on the node.
@@ -55,22 +55,43 @@ the template for these to take effect on the node.
 Once the build finishes, change directories to the folder where the newly
 built nodes are located:
 
-     cd build/nodes
+    cd build/nodes
 
 The Gradle build script will have created a folder for each node. You'll
 see three folders, one for each node and a `runnodes` script.
 
 ## Interacting with the nodes
 
-Go to the terminal window displaying the CRaSH shell of PartyA. Typing 'help' will display a list of the available commands.
+Nodes started via terminal will display an interactive shell:
+
+     Welcome to the Corda interactive shell.
+     Useful commands include 'help' to see what is available, and 'bye' to shut down the node.
+
+     Thu Apr 19 09:18:09 BRT 2018>>>
+
+Go to the terminal window displaying the CRaSH shell of PartyA. Typing `help` will display a list of the available commands.
+
+Type `flow list` in the shell to see a list of the flows that your node can run. In our case, this will return the following list:
+
+     com.template.ChangeValueFlow
+     com.template.IPOFlow
+     com.template.TradeFlow
+     net.corda.core.flows.ContractUpgradeFlow$Authorise
+     net.corda.core.flows.ContractUpgradeFlow$Deauthorise
+     net.corda.core.flows.ContractUpgradeFlow$Initiate
+     net.corda.finance.flows.CashConfigDataFlow
+     net.corda.finance.flows.CashExitFlow
+     net.corda.finance.flows.CashIssueAndPaymentFlow
+     net.corda.finance.flows.CashIssueFlow
+     net.corda.finance.flows.CashPaymentFlow
 
 Firstly, we want to create an IPO, with shares from company "A". We start the `IPOFlow` by typing:
 
-     start IPOFlow shareValue: 100, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
+    start IPOFlow shareValue: 100, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
 If the flow worked, it should have recorded in the vault of PartyA. Let's check, running:
 
-     run vaultQuery contractStateType: com.template.ShareState
+    run vaultQuery contractStateType: com.template.ShareState
 
 The vault of PartyA should display the following output:
 
@@ -107,7 +128,7 @@ The vault of PartyA should display the following output:
 
 Secondly, we can change the share price, with:
 
-     start ChangeValueFlow shareValue: 80, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
+    start ChangeValueFlow shareValue: 80, owner: "O=PartyA,L=London,C=GB", codigoAcao: "A"
 
 Now, the vault of PartyA displays only the last state, with the new price:
 
@@ -144,7 +165,7 @@ Now, the vault of PartyA displays only the last state, with the new price:
 
 Finally, we can change the owner of the share, typing:
 
-     start TradeFlow shareValue: 90, owner: "O=PartyB,L=New York,C=US", codigoAcao: "A"
+    start TradeFlow shareValue: 90, owner: "O=PartyB,L=New York,C=US", codigoAcao: "A"
 
 The vault of PartyA should display the following output:
 
@@ -156,7 +177,7 @@ The vault of PartyA should display the following output:
 
 Go to the terminal window displaying the CRaSH shell of PartyB, and check the vault, running:
 
-     run vaultQuery contractStateType: com.template.ShareState
+    run vaultQuery contractStateType: com.template.ShareState
 
 The vault of PartyB should display the following output:
 
@@ -211,32 +232,6 @@ embedded web server is running on. The API endpoints served are:
 And the static web content is served from:
 
      /web/template
-
-## Using the Example RPC Client
-
-The `ExampleClient.kt` file is a simple utility which uses the client
-RPC library to connect to a node and log its transaction activity.
-It will log any existing states and listen for any future states. To build 
-the client use the following Gradle task:
-
-     ./gradlew runTemplateClient
-
-To run the client:
-
-**Via IntelliJ:**
-
-Select the 'Run Template RPC Client'
-run configuration which, by default, connect to PartyA (RPC port 10006). Click the
-Green Arrow to run the client.
-
-**Via the command line:**
-
-Run the following Gradle task:
-
-     ./gradlew runTemplateClient
-     
-Note that the template rPC client won't output anything to the console as no state 
-objects are contained in either PartyA's or PartyB's vault.
 
 ## Running the Nodes Across Multiple Machines
 
