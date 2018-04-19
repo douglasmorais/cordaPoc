@@ -231,36 +231,28 @@ O conteúdo web estático é disponibilizado por:
 
      /web/template
 
-## Running the Nodes Across Multiple Machines
+## Rodando os nós em diferentes máquinas
 
-The nodes can also be set up to communicate between separate machines on the 
-same subnet.
+Os nós podem ser configurados para se comunicarem por diferentes máquinas na mesma sub-rede.
 
-After deploying the nodes, navigate to the build folder (`build/
-nodes`) and move some of the individual node folders to 
-separate machines on the same subnet (e.g. using a USB key). It is important 
-that no nodes - including the controller node - end up on more than one 
-machine. Each computer should also have a copy of `runnodes` and 
-`runnodes.bat`.
+Após gerar os nós, navegue até o diretório em que eles foram gerados (`build/nodes`) e mova algumas das pastas dos nós para
+máquinas separadas na mesma sub-rede (ex: usando um pendrive). É importante que nenhum nó ('controller' inclusive) esteja
+em mais de uma máquina. Cada computador deve ter uma cópia de `runnodes` e `runnodes.bat`.
 
-For example, you may end up with the following layout:
+Por exemplo, uma possível disposição:
 
-* Machine 1: `controller`, `partya`, `runnodes`, `runnodes.bat`
-* Machine 2: `partyb`, `partyc`, `runnodes`, `runnodes.bat`
+* Máquina 1: `controller`, `partya`, `runnodes`, `runnodes.bat`
+* Máquina 2: `partyb`, `partyc`, `runnodes`, `runnodes.bat`
 
-You must now edit the configuration file for each node, including the 
-controller. Open each node's config file (`[nodeName]/node.conf`), and make 
-the following changes:
+É necessário ainda editar o arquivo de configuração de cada nó, controller inclusive.
+Abra o arquivo de configuração de cada um dos nós (`[nodeName]/node.conf`), e faça as seguintes mudanças:
 
-* Change the artemis address to the machine's ip address (e.g. 
-  `artemisAddress="10.18.0.166:10005"`)
-* Change the network map address to the ip address of the machine where the 
-  controller node is running (e.g. `networkMapAddress="10.18.0.166:10002"`) 
-  (please note that the controller will not have a network map address)
+* Mude o artemisAddress para o endereço ip da máquina (ex: `artemisAddress="10.18.0.166:10005"`)
+* Mude o networkMapAddress para o endereço ip da máquina em que o nó controller está rodando (ex: `networkMapAddress="10.18.0.166:10002"`)
+  (observe que o controller não terá um networkMapAddress)
 
-Each machine should now run its nodes using `runnodes` or `runnodes.bat` 
-files. Once they are up and running, the nodes should be able to communicate 
-among themselves in the same way as when they were running on the same machine.
+Cada computador deve rodar seus nós usando os arquivos `runnodes` ou `runnodes.bat`.
+Assim que os nós estiverem rodando, deverão conseguir se comunicar entre si do mesmo modo como se estivessem na mesma máquina.
 
 ## Conteúdo adicional
 
